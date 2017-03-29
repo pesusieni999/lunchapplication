@@ -16,7 +16,24 @@
     </div>
     {% endif %}
     <div class="col-xs-12 row">
+      <h3>{{ topic.name }}</h3>
       <ul class="undecorated-list">
+        <li class="comment-field">
+          <div class="row col-xs-12">
+            <p>{{ topic.text }}</p>
+          </div>
+          <div class="row">
+            <span class="comment-info">Author: <i>{{ topic.author.username }}</i></span>
+            <span class="comment-info">Created: <i>{{ topic.created }}</i></span>
+            {% if comment.edited %}
+            <span class="comment-info">Edited: <i>{{ topic.modified }}</i></span>
+            {% endif %}
+            {% if request.user == comment.author %}
+            <a href="" class="pull-right"><span class="comment-info comment-link glyphicon glyphicon-remove"> Delete</span></a>
+            <a href="" class="pull-right"><span class="comment-info comment-link glyphicon glyphicon-pencil"> Edit</span></a>
+            {% endif %}
+          </div>
+        </li>
         {% for comment in comments %}
         <li class="comment-field">
           <div class="row col-xs-12">
