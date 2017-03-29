@@ -1,0 +1,33 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+  <head>
+  <title>Ohsiha lunch app</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" type="text/css" href="{% static 'bootstrap-3.3.7-dist/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'bootstrap-3.3.7-dist/css/bootstrap-theme.min.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'lunchapp.css' %}">
+
+  <script src="{% static 'jquery-3.1.1.min.js' %}"></script>
+  <script src="{% static 'bootstrap-3.3.7-dist/js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'jquery.bootstrap-autohidingnavbar.min.js' %}"></script>
+
+  {% block custom_css %}
+  {% endblock %}
+  {% block custom_js %}
+  {% endblock %}
+
+  </head>
+  <body>
+    {% include "header.html" %}
+
+    {% block content %}
+    {% endblock %}
+
+    <script type="text/javascript">
+      $("#mainNavbar").autoHidingNavbar();
+    </script>
+  </body>
+
+</html>

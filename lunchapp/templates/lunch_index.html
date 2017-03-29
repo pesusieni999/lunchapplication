@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+{% block custom_css %}
+<link rel="stylesheet"  type="text/css" href="https://cdn.datatables.net/v/bs/dt-1.10.13/fc-3.2.2/r-2.1.0/se-1.2.0/datatables.min.css"/>
+{% endblock %}
+{% block custom_js %}
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs/dt-1.10.13/fc-3.2.2/r-2.1.0/se-1.2.0/datatables.min.js"></script>
+<script type="text/javascript" src="{% static 'datatables-init.js' %}"></script>
+{% endblock %}
+{% block content %}
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>Ohsiha application</h1>
+  </div>
+</div>
+<div class="container main-container">
+  <div class="col-md-12">
+    {% if request.user.is_authenticated %}
+    <div class="col-xs-2 row">
+      <button type="button" id="add-new-topic-modal-open" class="btn" data-toggle="modal" data-target="#new-topic-modal">Add new topic</button>
+    </div>
+    {% endif %}
+    <div class="col-xs-12 row">
+      <div class="table-responsive">
+        <table class="table table-bordered datatables-table">
+          <thead>
+            <tr>
+              <th class="col-xs-4">Topic</th>
+              <th class="col-xs-2">Comments</th>
+              <th class="col-xs-3">Author</th>
+              <th class="col-xs-3">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for topic in topics %}
+            <tr>
+              <td>
+                <a class="rowlink" href="{% url 'topic_details' topic_id=topic.id %}">
+                  {{ topic.name }}
+                </a>
+              </td>
+              <td>{{ topic.comments.count }}</td>
+              <td>{{ topic.author.username }}</td>
+              <td>{{ topic.created }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% if request.user.is_authenticated %}
+    <div class="modal fade" id="new-topic-modal" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title">New topic</h3>
+          </div>
+          <div class="modal-body">
+            <form class="form-horizontal" id="new-topic-form" method="POST" action="{% url 'topic_list' %}">
+              {% csrf_token %}
+              {% for field in topic_form %}
+                {% bootstrap_field field %}
+                <span class="err-txt">{{ form.errors.field|striptags }}</span>
+              {% endfor %}
+              <div class="form-group">
+                <input id="new-topic-submit" type="submit" value="New topic" class="btn" />
+                <input type="submit" value="Close" class="btn" data-dismiss="modal" />
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}}

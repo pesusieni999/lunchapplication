@@ -1,0 +1,67 @@
+html, body {
+	height: 100%;
+}
+
+.container {
+	min-height: 100%;
+}
+
+.main-content {
+	padding: 5px;
+	border-radius: 5px;
+}
+
+.main-container {
+    margin-top: 60px;
+}
+
+.collapse-bar {
+	width: 100%;
+	margin-bottom: 3px;
+}
+
+.jumbotron {
+    margin-top: 40px;
+    height: 150px;
+    align-items: center;
+    display: flex;
+}
+
+.undecorated-list {
+	list-style: none;
+	padding-left: 0;
+}
+
+.rowlink::before {
+	content: "";
+	display: block;
+	position: absolute;
+	left: 0;
+	width: 100%;
+	height: 2em;
+}
+
+.form-field {
+	margin: 5px 5px 5px 5px;
+	padding: 10px 10px 10px 10px;
+}
+
+.comment-field {
+	margin: 10px 0 20px 0;
+	border: 2px solid #0f0f0f;
+	padding: 0 0 0 20px;
+	word-wrap: break-word;
+}
+
+.comment-info {
+	margin: 0 30px 0 0;
+}
+
+.modal-form {
+	margin: 0 10px 0 10px;
+}
+
+#logout-btn {
+	background-color: #2aabd2;
+	height: 40px;
+}

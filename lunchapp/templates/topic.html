@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+{% block content %}
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>Ohsiha application</h1>
+  </div>
+</div>
+<div class="container main-container">
+  <div class="col-md-12">
+    {% if request.user.is_authenticated %}
+    <div class="col-xs-2 row">
+      <button type="button" id="add-new-comment-modal-open" class="btn" data-toggle="modal" data-target="#new-comment-modal">Add new comment</button>
+    </div>
+    {% endif %}
+    <div class="col-xs-12 row">
+      <ul class="undecorated-list">
+        {% for comment in comments %}
+        <li class="comment-field">
+          <div class="row col-xs-12">
+            <p>
+              {% if comment.text is not None %}
+              {{ comment.text }}
+              {% else %}
+              <i>Deleted</i>
+              {% endif %}
+            </p>
+          </div>
+          <div class="row">
+            <span class="comment-info">Author: <i>
+              {% if comment.author is not None %}
+              {{ comment.author.username }}
+              {% else %}
+              Deleted
+              {% endif %}
+            </i></span>
+            <span class="comment-info">Created: <i>{{ comment.created }}</i></span>
+            {% if comment.edited %}
+            <span class="comment-info">Edited: <i>{{ comment.modified }}</i></span>
+            {% endif %}
+            {% if request.user == comment.author %}
+            <a href="" class="pull-right"><span class="comment-info comment-link glyphicon glyphicon-remove"> Delete</span></a>
+            <a href="" class="pull-right"><span class="comment-info comment-link glyphicon glyphicon-pencil"> Edit</span></a>
+            {% endif %}
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% if request.user.is_authenticated %}
+    <div class="modal fade" id="new-comment-modal" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title">New comment</h3>
+          </div>
+          <div class="modal-body modal-form">
+            <form class="form-horizontal" id="new-comment-form" method="POST" action=".">
+              {% csrf_token %}
+              {% for field in comment_form %}
+                {% bootstrap_field field %}
+                <span class="err-txt">{{ form.errors.field|striptags }}</span>
+              {% endfor %}
+              <div class="form-group">
+                <input id="new-comment-submit" type="submit" value="New comment" class="btn" />
+                <input type="submit" value="Close" class="" data-dismiss="modal" />
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}}
