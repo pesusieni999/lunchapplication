@@ -32,7 +32,7 @@ html, body {
 	padding-left: 0;
 }
 
-.rowlink::before {
+.row-link::before {
 	content: "";
 	display: block;
 	position: absolute;
@@ -64,4 +64,8 @@ html, body {
 #logout-btn {
 	/*background-color: #2aabd2;*/
 	height: 40px;
+}
+
+.err-txt {
+	color: #ba2121;
 }

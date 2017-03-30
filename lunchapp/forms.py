@@ -46,11 +46,13 @@ class TopicForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={
                 'placeholder': 'Topic name',
-                'class': 'form-control form-field'
+                'class': 'form-control form-field',
+                'id': 'new-topic-name'
             }),
             'text': forms.Textarea(attrs={
                 'placeholder': 'Comment',
-                'class': 'form-control form-field'
+                'class': 'form-control form-field',
+                'id': 'new-topic-text'
             })
         }
 

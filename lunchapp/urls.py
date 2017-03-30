@@ -10,4 +10,6 @@ urlpatterns = [
     url(r'^register/$', views.Register.as_view(), name='register'),
     url(r'^topics/$', views.TopicList.as_view(), name='topic_list'),
     url(r'^topics/(?P<topic_id>\d+)/$', views.TopicDetail.as_view(), name='topic_details'),
+    # This is a workaround URL for Django not working well with AJAX PUT.
+    url(r'^topics/(?P<topic_id>\d+)/edit/$', views.TopicEdit.as_view(), name='topic_edit'),
 ]

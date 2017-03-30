@@ -9,6 +9,7 @@ class Topic(models.Model):
     text = models.CharField(max_length=1024)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+    edited = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('created',)

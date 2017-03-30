@@ -1,0 +1,475 @@
+# OhSiHa HT.
+Idea: Verkkosivusto jossa käyttäjät voivat keskustella ja kommentoida TTY:n lounaista.
+
+## Ympäristö
+Django web framework + PostgreSQL + Local/Heroku.
+Snapshot asennusta voi kokeilla osoitteessa: https://ohsihalunch.herokuapp.com/lunch/
+Lähdekoodi löytyy github projektista: https://github.com/pesusieni999/lunchapplication
+
+
+# Vaihe 2
+
+## Yleinen ohje
+* Hyödynnä Djangon valmista User modelia.
+* Hyödynnä Djangon valmista Logout toiminnallisuutta.
+* Hyödynnä Djangon kattavaa dokumentaatiota rekisteröimisen ja loginin toteutukseen.
+* Luo View luokat Login ja rekisteröitymis logiikalle.
+* Luo View luokat keskustelu HTML näkymälle.
+* Luo rekisteröitymis HTML template.
+* Luo sisäänkirjautumis HTML template.
+* Luo keskustelu HTML template.
+* Luo JavaScript file johon lisäät logiikan jolla suoritetaan keskustelun päivitys&poisto.
+* Luo CSS file johon lisäät yleisiä sovelluksen tyylejä.
+* Muokkaa urls.py sisältöä, jotta osoitteiden reititys toimii uusiin näkymiin.
+
+## Totetutus
+* Verkkosivusto on laitettu toimintaan Heroku ympäristöön.
+* Sovellus tukee rekisteröitymistä (kaksivaiheinen suunnnitteilla).
+* Sovellus tukee sisään- ja uloskirjautumista.
+* Käyttäjät voivat luoda uusia keskusteluja.
+* Käyttäjät voivat muokata keskusteluja.
+* Käyttäjät voivat poistaa keskusteluja.
+* Käyttäjät voivat lisätä kommentteja keskusteluihin.
+
+## Verkkolähteet
+* DataTables:   https://datatables.net/
+* CSS:          https://www.w3schools.com/css/
+* JQuery:       http://api.jquery.com/
+* Django login: https://docs.djangoproject.com/en/1.10/topics/auth/
+
+## Helpot ja vaikeat asiat
+### Helpot asiat
+* Perus login/logout toiminnallisuus.
+* Herokun käyttö helppoa, kun konfiguroinnin on tehnyt kerran kunnolla.
+* Datatables käyttö.
+
+### Vaikeat asiat
+* PUT ei toimi helposti kun yrittää AJAX:lla PUT metodilla päivittää Django serveriä.
+* HTML templatejen pitäminen siisteinä ja luettavina (myös kun käyttä JQueryä).
+* Tyylien luominen ja muokkaaminen siisteiksi ja käytettäviksi.
+
+## Koodiotteet
+Python
+```python
+# View for login to the system.
+class Login(TemplateView):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'login.html', {'form': AuthenticationForm})
+
+    def post(self, request, **kwargs):
+        response = HttpResponseForbidden("Wrong username or password")
+        if request.user.is_authenticated():
+            return HttpResponseRedirect('lunch_index', status=200)
+
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            user = authenticate(
+                username=form.cleaned_data.get('username', ''),
+                password=form.cleaned_data.get('password', '')
+            )
+            if user is not None:
+                login(request, user)
+                return redirect('lunch_index')
+        return response
+
+
+# View for registering to the system.
+class Register(TemplateView):
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated():
+            return redirect('lunch_index')
+        return render(request, 'register.html', {'form': RegistrationForm()})
+
+    def post(self, request, **kwargs):
+        if request.user.is_authenticated():
+            return redirect('lunch_index')
+        form = RegistrationForm(data=request.POST)
+        if form.is_valid():
+            user = form.save()
+            user.set_password(user.password)
+            user.save()
+            return redirect('lunch_index')
+        return render(request, 'register.html', {'form': form})
+
+
+# View for updating Topic.
+class TopicEdit(TemplateView):
+    def post(self, request, *args, topic_id=0, **kwargs):
+        try:
+            topic = Topic.objects.get(id=topic_id, author=request.user)
+        except Topic.DoesNotExist:
+            return HttpResponseBadRequest('No such topic found.')
+        name = request.POST.get('name', None)
+        text = request.POST.get('text', None)
+        if name is not None:
+            topic.name = name
+        if text is not None:
+            topic.text = text
+        topic.save()
+
+        # Return 200.
+        return HttpResponse()
+```
+
+JavaScript
+```javascript
+/**
+ * Delete topic.
+ * Reads DELETE URL from DOM.
+ * Will redirect the user to lunch application main page.
+ */
+function deleteTopic() {
+    $.ajax({
+        url: $(".topic-delete-link").attr("href"),
+        type: "DELETE",
+        beforeSend: function(xhr) {
+            if (!this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", $("[name='csrfmiddlewaretoken']").val());
+            }
+        }
+    })
+    .done(function() {
+        // Redirect since current page is no longer valid.
+        window.location.replace($("#deleteRedirect").attr("href"));
+    })
+    .fail(function() {
+        return alert("Failed to delete topic.\n\nPlease reload the page and try again.");
+    });
+}
+
+/**
+ * Update topic.
+ * Reads new topic name, topic text and update URL from DOM.
+ * If successful, will reload the page.
+ */
+function updateTopic() {
+    // Treat empty fields as "no update" operations.
+    var newName = $("#new-topic-name").val().toString();
+    var newText = $("#new-topic-text").val().toString();
+    if (newName === "") {
+        newName = null;
+    }
+    if (newText === "") {
+        newText = null;
+    }
+
+    $.ajax({
+        url: $(".topic-edit-link").attr("href"),
+        type: 'POST',
+        data: {
+            name: newName,
+            text: newText
+        },
+        beforeSend: function(xhr) {
+            if (!this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", $("[name='csrfmiddlewaretoken']").val());
+            }
+        }
+    })
+    .done(function() {
+        // Reload the page to get up to date data from server.
+        // This could be improved so that instead of reload, we get new data from server in JSON
+        // and write it directly to DOM.
+        location.reload(true);
+    })
+    .fail(function() {
+        return alert("Failed to update the topic.\n\nPlease reload the page and try again.");
+    });
+}
+
+/**
+ * Open Topic edit-dialog.
+ * Update dialog form fields to current text values.
+ * @param modalDlg: Modal dialog DOM element.
+ */
+function updateTopicLinkClicked(modalDlg) {
+    $("#new-topic-name").val($("#topic-name").text());
+    $("#new-topic-text").val($("#topic-text").text());
+    modalDlg.modal({
+        keyboard: true
+    });
+}
+```
+
+HTML
+```html
+<!-- Edit topic dialog -->
+<div class="modal fade" id="edit-topic-modal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">New comment</h3>
+      </div>
+      <div class="modal-body modal-form">
+        <form class="form-horizontal" id="edit-topic-form" method="POST" action=".">
+          {% csrf_token %}
+          {% for field in edit_topic_form %}
+            {% bootstrap_field field %}
+            <span class="err-txt">{{ form.errors.field|striptags }}</span>
+          {% endfor %}
+          <div class="form-group">
+            <input id="update-topic-btn" type="submit" value="Submit" class="btn" />
+            <input type="submit" value="Close" class="" data-dismiss="modal" />
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- register.html -->
+{% extends "base.html" %}
+{% load bootstrap3 %}
+{% load staticfiles %}
+{% block content %}
+
+<div class="container main-container">
+  <div class="col-md-8 col-md-offset-2 form-wrapper">
+    <div class="form-heading-container">
+      <h2 class="form-heading">Create a new account</h2>
+    </div>
+    <form method="POST" action="." id="register-form">
+      {% csrf_token %}
+      {% for field in form %}
+      {% bootstrap_field field %}
+      <span class="err-txt">{{ form.errors.field|striptags }}</span>
+      {% endfor %}
+      <div class="form-group">
+        <input id="register-submit" type="submit" value="Register" class="btn btn-submit" />
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+```
+
+CSS
+```css
+.form-field {
+	margin: 5px 5px 5px 5px;
+	padding: 10px 10px 10px 10px;
+}
+
+.comment-field {
+	margin: 10px 0 20px 0;
+	border: 2px solid #0f0f0f;
+	padding: 0 0 0 20px;
+	word-wrap: break-word;
+}
+
+.comment-info {
+	margin: 0 30px 0 0;
+}
+
+.modal-form {
+	margin: 0 10px 0 10px;
+}
+
+#logout-btn {
+	/*background-color: #2aabd2;*/
+	height: 40px;
+}
+
+.err-txt {
+	color: #ba2121;
+}
+```
+
+
+# Vaihe 1:
+## Asentaminen:
+### Django
+1.  virtualenv env
+2.  source env/bin/activate
+3.  pip install django
+5.  cd ~
+6.  django-admin.py startproject lunchapplication
+7.  cd lunchapplication
+8.  python manage.py startapp lunchapp
+9. <edit settings>
+
+### Hyödylliset python kirjastot
+* appdirs==1.4.3
+* dj-database-url==0.4.2
+* django-bootstrap3==8.2.1
+* gunicorn==19.7.1
+* packaging==16.8
+* psycopg2==2.7.1
+* pyparsing==2.2.0
+* six==1.10.0
+* whitenoise==3.3.0
+
+### PostgreSQL
+1.  sudo apt-get update
+2.  sudo apt-get install python-pip python-dev libpq-dev postgresql postgresql-contrib
+3.  sudo su - postgres
+4.  psql
+5.  CREATE DATABASE myproject;
+6.  CREATE USER myprojectuser WITH PASSWORD 'password';
+7.  ALTER ROLE myprojectuser SET client_encoding TO 'utf8';
+8.  ALTER ROLE myprojectuser SET default_transaction_isolation TO 'read committed';
+9.  ALTER ROLE myprojectuser SET timezone TO 'UTC';
+10. GRANT ALL PRIVILEGES ON DATABASE myproject TO myprojectuser;
+11. \q
+12. exit
+13. pip install django psycopg2
+14. <edit settings.py to use PostgreSQL>
+15. python manage.py makemigrations
+16. python manage.py migrate
+
+### Heroku
+1. Download Heroku CLI.
+2. Create Heroku account.
+3. Type "heroku create"
+4. Create Procfile.
+5. Create runtime.txt.
+6. Push to heroku remote master.
+
+## Toiminnallisuus (OLD)
+* Users can GET/POST/UPDATE/DELETE topics. (Note POST/UPDATE/DELETE require login)
+* Users can login/logout (Precreated accounts).
+
+## Hyödylliset linkit
+* Django:       https://www.djangoproject.com/
+* PostgreSQL:   https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-14-04)
+* Heroku:       https://devcenter.heroku.com/articles/deploying-python
+* Heroku:       https://devcenter.heroku.com/articles/getting-started-with-python
+* Static files: http://whitenoise.evans.io/en/stable/
+
+## Helpot asiat:
+* Django has a multitude of documentation and web discussions.
+* PostgreSQL guide is very extensive and clear. First attempt try led to success.
+* Bootstrap offers easy way to create stylish minimalistic web UIs.
+
+## Vaikeat asiat:
+* Creating custom CSS styles.
+* Configuring Whitenoise to serve django static files.
+* Getting system to work in Heroku environment took considerable time.
+
+## Koodi otteet:
+
+Python
+```python
+# Models
+class Topic(models.Model):
+    author = models.ForeignKey(User, related_name='topics', on_delete=models.CASCADE)
+    name = models.CharField(max_length=128)
+    text = models.CharField(max_length=1024)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ('created',)
+
+# Forms
+class TopicForm(forms.ModelForm):
+    """
+    Form used to create new Topic.
+    """
+    class Meta:
+        model = Topic
+        fields = {'name', 'text'}
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'placeholder': 'Topic name',
+                'class': 'form-control form-field'
+            }),
+            'text': forms.Textarea(attrs={
+                'placeholder': 'Comment',
+                'class': 'form-control form-field'
+            })
+        }
+
+# Views
+class IndexPage(TemplateView):
+    def get(self, request, **kwargs):
+        topics = Topic.objects.all()
+        topic_form = TopicForm()
+        return render(request, 'lunch_index.html', {
+            'topics': topics,
+            'topic_form': topic_form
+        })
+
+
+class TopicDetail(TemplateView):
+    def get(self, request, *args, topic_id=0, **kwargs):
+        try:
+            topic = Topic.objects.get(id=topic_id)
+        except Topic.DoesNotExist:
+            return redirect('lunch_index')
+
+        comments = Comment.objects.filter(topic=topic_id)
+        comment_form = CommentForm()
+        return render(request, 'topic.html', {
+            'comments': comments,
+            'comment_form': comment_form,
+            'topic': topic
+        })
+
+    def post(self, request, topic_id=0):
+        try:
+            topic = Topic.objects.get(id=topic_id)
+        except Topic.DoesNotExist:
+            return redirect('lunch_index')
+
+        comment_form = CommentForm(data=request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.author = request.user
+            comment.topic = topic
+            comment.save()
+            return redirect('/lunch/topics/' + str(topic.id))
+
+        comments = Comment.objects.filter(topic=topic_id)
+
+        return render(request, 'topic.html', {
+            'comments': comments,
+            'comment_form': comment_form,
+            'topic': topic
+        })
+
+# Urls
+urlpatterns = [
+    url(r'^$', views.IndexPage.as_view(), name='lunch_index'),
+    url(r'^login/$', views.Login.as_view(), name='login'),
+    url(r'^logout/$', logout, {'next_page': 'lunch_index'}, name='logout'),
+    url(r'^register/$', views.Register.as_view(), name='register'),
+    url(r'^topics/$', views.TopicList.as_view(), name='topic_list'),
+    url(r'^topics/(?P<topic_id>\d+)/$', views.TopicDetail.as_view(), name='topic_details'),
+]
+
+# Settings
+in_heroku = False
+if 'DATABASE_URL' in os.environ:
+    in_heroku = True
+
+if in_heroku:
+    DATABASES = {'default': dj_database_url.config()}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'replace',
+            'USER': 'replace',
+            'PASSWORD': 'replace',
+            'HOST': 'localhost',
+            'PORT': '',
+        }
+    }
+
+# WSGI
+import os, sys
+
+sys.path.insert(1, os.path.dirname(os.path.realpath(__file__)))
+
+import django.core
+import django.core.handlers
+from django.core.wsgi import get_wsgi_application
+from whitenoise.django import DjangoWhiteNoise
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lunchapplication.settings")
+
+application = get_wsgi_application()
+application = DjangoWhiteNoise(application)
+```
