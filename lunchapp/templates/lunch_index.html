@@ -37,7 +37,7 @@
             {% for topic in topics %}
             <tr>
               <td>
-                <a class="row-link" href="{% url 'topic_details' topic_id=topic.id %}">
+                <a class="row-link" href="{% url 'topics' topic_id=topic.id %}">
                   {{ topic.name }}
                 </a>
               </td>
@@ -58,14 +58,14 @@
             <h3 class="modal-title">New topic</h3>
           </div>
           <div class="modal-body">
-            <form class="form-horizontal" id="new-topic-form" method="POST" action="{% url 'topic_list' %}">
+            <form class="form-horizontal" id="new-topic-form" method="POST" action="{% url 'topics' topic_id=0 %}">
               {% csrf_token %}
               {% for field in topic_form %}
                 {% bootstrap_field field %}
                 <span class="err-txt">{{ form.errors.field|striptags }}</span>
               {% endfor %}
               <div class="form-group">
-                <input id="new-topic-submit" type="submit" value="New topic" class="btn" />
+                <input id="new-topic-submit" type="submit" value="Post" class="btn" />
                 <input type="submit" value="Close" class="btn" data-dismiss="modal" />
               </div>
             </form>

@@ -7,6 +7,7 @@
 {% block content %}
 
 <a class="hidden" id="deleteRedirect" href="{% url 'lunch_index' %}"></a>
+<a class="hidden" id="postNewCommentUrl" href="{% url 'comments' topic_id=topic.id comment_id=0 %}"></a>
 <div class="jumbotron">
   <div class="container">
     <h1>Ohsiha application</h1>
@@ -16,7 +17,7 @@
   <div class="col-md-12">
     {% if request.user.is_authenticated %}
     <div class="col-xs-2 row">
-      <button type="button" id="add-new-comment-modal-open" class="btn" data-toggle="modal" data-target="#new-comment-modal">Add new comment</button>
+      <button type="button" id="add-new-comment-modal-open" class="btn" data-toggle="modal" data-target="#comment-modal">Add new comment</button>
     </div>
     {% endif %}
     <div class="col-xs-12 row">
@@ -33,10 +34,10 @@
             <span class="comment-info">Edited: <i>{{ topic.modified }}</i></span>
             {% endif %}
             {% if request.user == topic.author %}
-            <a href="{% url 'topic_details' topic_id=topic.id %}" class="pull-right topic-delete-link">
+            <a href="{% url 'topics' topic_id=topic.id %}" class="pull-right topic-delete-link">
               <span class="comment-info comment-link glyphicon glyphicon-remove"> Delete</span>
             </a>
-            <a href="{% url 'topic_edit' topic_id=topic.id %}" class="pull-right topic-edit-link">
+            <a href="{% url 'topics' topic_id=topic.id %}" class="pull-right topic-edit-link">
               <span class="comment-info comment-link glyphicon glyphicon-pencil"> Edit</span>
             </a>
             {% endif %}
@@ -45,20 +46,14 @@
         {% for comment in comments %}
         <li class="comment-field">
           <div class="row col-xs-12">
-            <p>
-              {% if comment.text is not None %}
-              {{ comment.text }}
-              {% else %}
-              <i>Deleted</i>
-              {% endif %}
-            </p>
+            <p class="comment-text-field">{% if comment.text is not None %}{{ comment.text }}{% else %}<i>[Deleted]</i>{% endif %}</p>
           </div>
           <div class="row">
             <span class="comment-info">Author: <i>
               {% if comment.author is not None %}
               {{ comment.author.username }}
               {% else %}
-              Deleted
+              [Deleted]
               {% endif %}
             </i></span>
             <span class="comment-info">Created: <i>{{ comment.created }}</i></span>
@@ -66,8 +61,8 @@
             <span class="comment-info">Edited: <i>{{ comment.modified }}</i></span>
             {% endif %}
             {% if request.user == comment.author %}
-            <a href="" class="pull-right"><span class="comment-info comment-link glyphicon glyphicon-remove"> Delete</span></a>
-            <a href="" class="pull-right"><span class="comment-info comment-link glyphicon glyphicon-pencil"> Edit</span></a>
+            <a href="{% url 'comments' topic_id=topic.id comment_id=comment.id %}" class="pull-right comment-delete-link"><span class="comment-info comment-link glyphicon glyphicon-remove"> Delete</span></a>
+            <a href="{% url 'comments' topic_id=topic.id comment_id=comment.id %}" class="pull-right comment-edit-link"><span class="comment-info comment-link glyphicon glyphicon-pencil"> Edit</span></a>
             {% endif %}
           </div>
         </li>
@@ -76,22 +71,22 @@
     </div>
     {% if request.user.is_authenticated %}
     <!-- New comment dialog. -->
-    <div class="modal fade" id="new-comment-modal" role="dialog">
+    <div class="modal fade" id="comment-modal" role="dialog">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
             <h3 class="modal-title">New comment</h3>
           </div>
           <div class="modal-body modal-form">
-            <form class="form-horizontal" id="new-comment-form" method="POST" action=".">
+            <form class="form-horizontal" id="comment-form" method="POST" action="{% url 'comments' topic_id=topic.id comment_id=0 %}">
               {% csrf_token %}
               {% for field in comment_form %}
                 {% bootstrap_field field %}
                 <span class="err-txt">{{ form.errors.field|striptags }}</span>
               {% endfor %}
               <div class="form-group">
-                <input id="new-comment-submit" type="submit" value="New comment" class="btn" />
-                <input type="submit" value="Close" class="" data-dismiss="modal" />
+                <input id="comment-submit" type="submit" value="Submit" class="btn" />
+                <input id="comment-dlg-dismiss" type="submit" value="Close" class="" data-dismiss="modal" />
               </div>
             </form>
           </div>
@@ -106,7 +101,7 @@
             <h3 class="modal-title">New comment</h3>
           </div>
           <div class="modal-body modal-form">
-            <form class="form-horizontal" id="edit-topic-form" method="POST" action=".">
+            <form class="form-horizontal" id="edit-topic-form" method="POST" action="{% url 'topics' topic_id=topic.id %}">
               {% csrf_token %}
               {% for field in edit_topic_form %}
                 {% bootstrap_field field %}

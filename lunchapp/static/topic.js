@@ -22,21 +22,33 @@ function deleteTopic() {
     });
 }
 
+function deleteComment(deleteURL) {
+    $.ajax({
+        url: deleteURL,
+        type: "DELETE",
+        beforeSend: function(xhr) {
+            if (!this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", $("[name='csrfmiddlewaretoken']").val());
+            }
+        }
+    })
+    .done(function() {
+        // Redirect since current page is no longer valid.
+        location.reload(true);
+    })
+    .fail(function() {
+        return alert("Failed to delete comment.\n\nPlease reload the page and try again.");
+    });
+}
+
 /**
  * Update topic.
  * Reads new topic name, topic text and update URL from DOM.
  * If successful, will reload the page.
  */
 function updateTopic() {
-    // Treat empty fields as no update operations.
     var newName = $("#new-topic-name").val().toString();
     var newText = $("#new-topic-text").val().toString();
-    if (newName === "") {
-        newName = null;
-    }
-    if (newText === "") {
-        newText = null;
-    }
 
     $.ajax({
         url: $(".topic-edit-link").attr("href"),
@@ -62,6 +74,36 @@ function updateTopic() {
     });
 }
 
+function updateComment() {
+    var newText = $("#new-comment-text").val().toString();
+
+    $.ajax({
+        url: $("#comment-form").attr("action"),
+        type: 'POST',
+        data: {
+            text: newText
+        },
+        beforeSend: function(xhr) {
+            if (!this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", $("[name='csrfmiddlewaretoken']").val());
+            }
+        }
+    })
+    .done(function() {
+        // Reload the page to get up to date data from server.
+        // This could be improved so that instead of reload, we get new data from server in JSON
+        // and write it directly to DOM.
+        location.reload(true);
+    })
+    .fail(function() {
+        return alert("Failed to update the topic.\n\nPlease reload the page and try again.");
+    });
+
+    // Clear the dialog so that if user tries to create new comment, it is empty.
+    $("#new-comment-text").val("");
+    $("#comment-form").attr("action", $("#postNewCommentUrl").attr("href"));
+}
+
 /**
  * Open Topic edit-dialog.
  * Update dialog form fields to current text values.
@@ -75,10 +117,23 @@ function updateTopicLinkClicked(modalDlg) {
     });
 }
 
+function updateCommentLinkClicked(modalDlg, text, url) {
+    $("#new-comment-text").val(text);
+    $("#comment-form").attr("action", url);
+    modalDlg.modal({
+        keyboard: true
+    });
+}
+
 $(document).ready(function() {
     $(".topic-delete-link").click(function(e) {
         e.preventDefault();
         deleteTopic();
+    });
+
+    $(".comment-delete-link").click(function(e) {
+        e.preventDefault();
+        deleteComment($(this).attr("href"));
     });
 
     $(".topic-edit-link").click(function(e) {
@@ -86,8 +141,25 @@ $(document).ready(function() {
         updateTopicLinkClicked($("#edit-topic-modal"));
     });
 
+    $(".comment-edit-link").click(function(e) {
+        e.preventDefault();
+        var currentText = $(this).parent().parent().find(".comment-text-field").text().toString();
+        updateCommentLinkClicked($("#comment-modal"), currentText, $(this).attr("href"));
+    });
+
     $("#update-topic-btn").click(function(e) {
         e.preventDefault();
         updateTopic();
     });
+
+    $("#comment-submit").click(function(e) {
+        e.preventDefault();
+        updateComment();
+    });
+
+    $("#comment-dlg-dismiss").click(function(e) {
+        // Clear the dialog so that if user tries to create new comment, it is empty.
+        $("#new-comment-text").val("");
+        $("#comment-form").attr("action", $("#postNewCommentUrl").attr("href"));
+    })
 });
