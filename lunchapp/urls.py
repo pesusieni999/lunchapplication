@@ -10,8 +10,8 @@ urlpatterns = [
     url(r'^logout/$', logout, {'next_page': 'lunch_index'}, name='logout'),
     url(r'^oauth/', include('social_django.urls'), name='social'),
     url(r'^register/$', views.Register.as_view(), name='register'),
-    url(r'^settings/$', views.settings, name='settings'),
-    url(r'^settings/password/$', views.password, name='password'),
+    url(r'^settings/$', views.Settings.as_view(), name='settings'),
+    url(r'^settings/password/$', views.Password.as_view(), name='password'),
     url(r'^topics/(?P<topic_id>\d+)/$', views.Topics.as_view(), name='topics'),
     url(r'^topics/(?P<topic_id>\d+)/(?P<comment_id>\d+)/$', views.Comments.as_view(), name='comments'),
 ]

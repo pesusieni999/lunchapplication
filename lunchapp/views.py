@@ -134,31 +134,39 @@ class Comments(TemplateView):
         return HttpResponse()
 
 
-@login_required
-def settings(request):
-    user = request.user
+class Settings(TemplateView):
+    def get(self, request, *args, **kwargs):
+        user = request.user
 
-    try:
-        github_login = user.social_auth.get(provider='github')
-    except UserSocialAuth.DoesNotExist:
-        github_login = None
+        try:
+            github_login = user.social_auth.get(provider='github')
+        except UserSocialAuth.DoesNotExist:
+            github_login = None
 
-    can_disconnect = (user.social_auth.count() > 1 or user.has_usable_password())
+        can_disconnect = (user.social_auth.count() > 1 or user.has_usable_password())
 
-    return render(request, 'settings.html', {
-        'github_login': github_login,
-        'can_disconnect': can_disconnect
-    })
+        return render(request, 'settings.html', {
+            'github_login': github_login,
+            'can_disconnect': can_disconnect
+        })
 
 
-@login_required
-def password(request):
-    if request.user.has_usable_password():
-        password_form = PasswordChangeForm
-    else:
-        password_form = AdminPasswordChangeForm
+class Password(TemplateView):
+    def get(self, request, *args, **kwargs):
+        if request.user.has_usable_password():
+            password_form = PasswordChangeForm
+        else:
+            password_form = AdminPasswordChangeForm
 
-    if request.method == 'POST':
+        form = password_form(request.user)
+        return render(request, 'password.html', {'form': form})
+
+    def post(self, request):
+        if request.user.has_usable_password():
+            password_form = PasswordChangeForm
+        else:
+            password_form = AdminPasswordChangeForm
+
         form = password_form(request.user, request.POST)
         if form.is_valid():
             form.save()
@@ -168,6 +176,4 @@ def password(request):
         else:
             pass
             # messages.error(request, 'Please correct the error below.')
-    else:
-        form = password_form(request.user)
-    return render(request, 'password.html', {'form': form})
+        return render(request, 'password.html', {'form': form})

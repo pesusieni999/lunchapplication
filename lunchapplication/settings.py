@@ -21,14 +21,19 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'f8iyqii=xlreabzq(rz2+kt4x1-ayt8o4o3s_290792f_@cew9'
-SOCIAL_AUTH_GITHUB_KEY = '7a9a6eeed33f3292ad2b'
-SOCIAL_AUTH_GITHUB_SECRET = 'cea11b1e49ea41a3b78ec39a1790afed0c62af98'
+SECRET_KEY = ''
+SOCIAL_AUTH_GITHUB_KEY = ''
+SOCIAL_AUTH_GITHUB_SECRET = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '0.0.0.0', 'ohsihalunch.herokuapp.com']
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    '0.0.0.0',
+    'ohsihalunch.herokuapp.com'
+]
 
 # Redirect URLs.
 LOGIN_URL = 'login'

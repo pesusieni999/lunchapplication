@@ -15,7 +15,7 @@
     <h1>Ohsiha application</h1>
   </div>
 </div>
-<div class="container main-container">
+<div class="container main-container col-md-8 col-xs-12">
   <div class="col-md-12">
     {% if request.user.is_authenticated %}
     <div class="col-xs-2 row">
@@ -76,5 +76,7 @@
     {% endif %}
   </div>
 </div>
+
+{% include "menu.html" %}
 
 {% endblock %}}

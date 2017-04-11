@@ -61,9 +61,15 @@ html, body {
 	margin: 0 10px 0 10px;
 }
 
-#logout-btn {
-	/*background-color: #2aabd2;*/
-	height: 40px;
+#logout-btn, #logout-btn:hover {
+	padding: 5px 15px 5px 20px;
+	color: #0f0f0f;
+	text-decoration: none;
+	display: inline;
+}
+
+.navbar-button:hover {
+	background-color: #9d9d9d !important;
 }
 
 .err-txt {
