@@ -7,9 +7,9 @@ This is project work for course MAT-81000 (2017) of TUT.
 ## Lunch API
 ### Topics list:
 URL: https://ohsihalunch.herokuapp.com/lunch/api/topics/
-Methods: GET, POST
-Usage: List all available topics. Create new topic.
-Example (using httpie):
+* Methods: GET, POST
+* Usage: List all available topics. Create new topic.
+* Example (using httpie):
 ```shell
 # GET
 http https://ohsihalunch.herokuapp.com/lunch/topics/
@@ -20,9 +20,9 @@ http -a user:psw POST https://ohsihalunch.herokuapp.com/lunch/topics/ name="REST
 
 ### Topics details:
 URL: https://ohsihalunch.herokuapp.com/lunch/api/topics/<id>/
-Methods: GET, PUT, DELETE
-Usage: Show single topic. Update single topic. Delete single topic.
-Example (using httpie):
+* Methods: GET, PUT, DELETE
+* Usage: Show single topic. Update single topic. Delete single topic.
+* Example (using httpie):
 ```shell
 # GET
 http https://ohsihalunch.herokuapp.com/lunch/topics/1/
@@ -37,9 +37,9 @@ http -a user:psw DELETE https://ohsihalunch.herokuapp.com/lunch/api/topics/1/
 
 ### Comments list:
 URL: https://ohsihalunch.herokuapp.com/lunch/api/topics/<id>/comments/
-Methods: GET, POST
-Usage: List all available comments in single topic. Create new comment.
-Example (using httpie):
+* Methods: GET, POST
+* Usage: List all available comments in single topic. Create new comment.
+* Example (using httpie):
 ```shell
 # GET
 http https://ohsihalunch.herokuapp.com/lunch/topics/1/comments/
@@ -50,9 +50,9 @@ http -a user:psw POST https://ohsihalunch.herokuapp.com/lunch/topics/1/comments/
 
 ### Comments details:
 URL: https://ohsihalunch.herokuapp.com/lunch/api/topics/<topic_id>/comments/<id>/
-Methods: GET, PUT, DELETE
-Usage: Show single comment. Update single comment. Delete single comment.
-Example (using httpie):
+* Methods: GET, PUT, DELETE
+* Usage: Show single comment. Update single comment. Delete single comment.
+* Example (using httpie):
 ```shell
 # GET
 http https://ohsihalunch.herokuapp.com/lunch/topics/1/comments/1/
