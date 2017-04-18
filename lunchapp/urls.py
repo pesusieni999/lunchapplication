@@ -6,6 +6,7 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.IndexPage.as_view(), name='lunch_index'),
+    url(r'^api/', include('lunchapi.urls')),
     url(r'^login/$', views.Login.as_view(), name='login'),
     url(r'^logout/$', logout, {'next_page': 'lunch_index'}, name='logout'),
     url(r'^oauth/', include('social_django.urls'), name='social'),

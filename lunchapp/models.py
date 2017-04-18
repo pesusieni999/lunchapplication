@@ -25,3 +25,23 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ('created',)
+
+
+"""
+class Restaurant(models.Model):
+    name = models.CharField(max_length=256)
+
+
+class Diets(models.Model):
+    abbreviation = models.CharField(max_length=8)
+    long_name = models.CharField(max_length=128)
+
+
+class Meal(models.Model):
+    name = models.CharField(max_length=64)
+
+
+class Food(models.Model):
+    name = models.CharField(max_length=64)  # Chili con carne
+    diets = models.ForeignKey(Diets, related_name='food', on_delete=models.SET_NULL, null=True)
+"""
