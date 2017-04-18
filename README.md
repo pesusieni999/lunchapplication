@@ -28,11 +28,11 @@ Example (using httpie):
 http https://ohsihalunch.herokuapp.com/lunch/topics/1/
 
 # PUT
-http -a user:psw PUT http://127.0.0.1:8000/lunch/api/topics/1/ name="REST topic" text="This is some text. edited"
+http -a user:psw PUT https://ohsihalunch.herokuapp.com/lunch/api/topics/1/ name="REST topic" text="This is some text. edited"
 
 
 # DELETE
-http -a user:psw DELETE http://127.0.0.1:8000/lunch/api/topics/1/
+http -a user:psw DELETE https://ohsihalunch.herokuapp.com/lunch/api/topics/1/
 ```
 
 ### Comments list:
@@ -42,7 +42,7 @@ Usage: List all available comments in single topic. Create new comment.
 Example (using httpie):
 ```shell
 # GET
-http https://ohsihalunch.herokuapp.com/lunch/topics/
+http https://ohsihalunch.herokuapp.com/lunch/topics/1/comments/
 
 # POST
 http -a user:psw POST https://ohsihalunch.herokuapp.com/lunch/topics/1/comments/1/ topic=1 text="comment text"
@@ -61,5 +61,5 @@ http https://ohsihalunch.herokuapp.com/lunch/topics/1/comments/1/
 http -a user:psw POST https://ohsihalunch.herokuapp.com/lunch/topics/1/comments/1/ text="comment text" topic=1
 
 # DELETE
-http -a user:psw DELETE http://127.0.0.1:8000/lunch/api/topics/1/comments/1
+http -a user:psw DELETE https://ohsihalunch.herokuapp.com/lunch/api/topics/1/comments/1
 ```
