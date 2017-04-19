@@ -2,8 +2,20 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-# Create your models here.
+__author__ = "Ville Myllynen"
+__copyright__ = "Copyright 2017, Ohsiha Project"
+__credits__ = ["Ville Myllynen"]
+__license__ = "MIT"
+__version__ = "1.0"
+__maintainer__ = "Ville Myllynen"
+__email__ = "ville.myllynen@student.tut.fi"
+__status__ = "Development"
+
+
 class Topic(models.Model):
+    """
+    Model for topics. Topics are discussions to which comments can be added.
+    """
     author = models.ForeignKey(User, related_name='topics', on_delete=models.CASCADE)
     name = models.CharField(max_length=128)
     text = models.CharField(max_length=1024)
@@ -16,6 +28,9 @@ class Topic(models.Model):
 
 
 class Comment(models.Model):
+    """
+    Model for comments. Comments belong to a topic.
+    """
     author = models.ForeignKey(User, related_name='comments', on_delete=models.CASCADE, null=True)
     text = models.CharField(max_length=1024, null=True)
     topic = models.ForeignKey(to=Topic, related_name="comments", on_delete=models.CASCADE)
@@ -25,23 +40,3 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ('created',)
-
-
-"""
-class Restaurant(models.Model):
-    name = models.CharField(max_length=256)
-
-
-class Diets(models.Model):
-    abbreviation = models.CharField(max_length=8)
-    long_name = models.CharField(max_length=128)
-
-
-class Meal(models.Model):
-    name = models.CharField(max_length=64)
-
-
-class Food(models.Model):
-    name = models.CharField(max_length=64)  # Chili con carne
-    diets = models.ForeignKey(Diets, related_name='food', on_delete=models.SET_NULL, null=True)
-"""

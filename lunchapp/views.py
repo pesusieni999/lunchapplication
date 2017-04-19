@@ -1,18 +1,28 @@
-from urllib.parse import urlparse, parse_qs
 from django.shortcuts import render, redirect, reverse
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden, JsonResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden, HttpResponseBadRequest
 from django.views.generic import TemplateView
-from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.contrib.auth import authenticate, login, update_session_auth_hash
 from django.contrib.auth.forms import AuthenticationForm, AdminPasswordChangeForm, PasswordChangeForm
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 
 from lunchapp.forms import CommentForm, RegistrationForm, TopicForm
 from lunchapp.models import Comment, Topic
 from social_django.models import UserSocialAuth
 
 
+__author__ = "Ville Myllynen"
+__copyright__ = "Copyright 2017, Ohsiha Project"
+__credits__ = ["Ville Myllynen"]
+__license__ = "MIT"
+__version__ = "1.0"
+__maintainer__ = "Ville Myllynen"
+__email__ = "ville.myllynen@student.tut.fi"
+__status__ = "Development"
+
+
 class IndexPage(TemplateView):
+    """
+    Main page of Lunch application.
+    """
     def get(self, request, **kwargs):
         topics = Topic.objects.all()
         topic_form = TopicForm()
@@ -23,6 +33,9 @@ class IndexPage(TemplateView):
 
 
 class Login(TemplateView):
+    """
+    Login page for the system.
+    """
     def get(self, request, *args, **kwargs):
         return render(request, 'login.html', {'form': AuthenticationForm})
 
@@ -44,6 +57,9 @@ class Login(TemplateView):
 
 
 class Register(TemplateView):
+    """
+    Registration page for the system.
+    """
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated():
             return redirect('lunch_index')
@@ -62,6 +78,9 @@ class Register(TemplateView):
 
 
 class Topics(TemplateView):
+    """
+    Topic page. Get single topic, create a new topic or delete existing topic.
+    """
     def get(self, request, *args, topic_id=0, **kwargs):
         try:
             topic = Topic.objects.get(id=topic_id)
@@ -106,6 +125,10 @@ class Topics(TemplateView):
 
 
 class Comments(TemplateView):
+    """
+    View for creating, updating and deleting comments.
+    Note: Deleting leaves the entry but author and text is cleared.
+    """
     def post(self, request, topic_id=0, comment_id=0):
         text = request.POST.get('text', None)
         try:
@@ -135,6 +158,9 @@ class Comments(TemplateView):
 
 
 class Settings(TemplateView):
+    """
+    Settings page. Here user can link/unlink Github accounts to local account.
+    """
     def get(self, request, *args, **kwargs):
         user = request.user
 
@@ -152,6 +178,9 @@ class Settings(TemplateView):
 
 
 class Password(TemplateView):
+    """
+    Password management page. Change password.
+    """
     def get(self, request, *args, **kwargs):
         if request.user.has_usable_password():
             password_form = PasswordChangeForm

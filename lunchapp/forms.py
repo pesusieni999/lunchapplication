@@ -6,8 +6,8 @@ from lunchapp.models import Comment, Topic
 __author__ = "Ville Myllynen"
 __copyright__ = "Copyright 2017, Ohsiha Project"
 __credits__ = ["Ville Myllynen"]
-__license__ = "LGPLv3.0"
-__version__ = "0.0.1"
+__license__ = "MIT"
+__version__ = "1.0"
 __maintainer__ = "Ville Myllynen"
 __email__ = "ville.myllynen@student.tut.fi"
 __status__ = "Development"

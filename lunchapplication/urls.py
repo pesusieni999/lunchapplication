@@ -17,6 +17,17 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from . import views
 
+
+__author__ = "Ville Myllynen"
+__copyright__ = "Copyright 2017, Ohsiha Project"
+__credits__ = ["Ville Myllynen"]
+__license__ = "MIT"
+__version__ = "1.0"
+__maintainer__ = "Ville Myllynen"
+__email__ = "ville.myllynen@student.tut.fi"
+__status__ = "Development"
+
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^lunch/', include('lunchapp.urls')),

@@ -1,19 +1,19 @@
-from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.renderers import JSONRenderer
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.views import APIView
-from django.http import Http404
 from rest_framework import generics, mixins
-from rest_framework.parsers import JSONParser
 from rest_framework import permissions
 from django.contrib.auth.models import User
 from lunchapp.models import Topic, Comment
 from lunchapi.serializers import TopicSerializer, CommentSerializer, UserSerializer
 from lunchapi.permissions import IsOwnerOrReadOnly
+
+
+__author__ = "Ville Myllynen"
+__copyright__ = "Copyright 2017, Ohsiha Project"
+__credits__ = ["Ville Myllynen"]
+__license__ = "MIT"
+__version__ = "1.0"
+__maintainer__ = "Ville Myllynen"
+__email__ = "ville.myllynen@student.tut.fi"
+__status__ = "Development"
 
 
 class TopicList(generics.ListCreateAPIView):

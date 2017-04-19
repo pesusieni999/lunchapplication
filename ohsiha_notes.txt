@@ -9,6 +9,161 @@ Lähdekoodi löytyy github projektista: https://github.com/pesusieni999/lunchapp
 ## Toteutetut lisäosat
 * OAUTH (Github) (Suosittelen lämpimästi Vaihe 3:n verkkolähteet osiossa mainittua OAUTH ohjetta.)
 * AJAX (UPDATE/DELETE keskusteluille ja kommenteilla. GET lounasdatalle.)
+* API (katso README.md käyttöohje).
+* Github projekti (MIT lisenssi).
+
+
+# Vaihe 4
+
+## Yleinen ohje
+* Suosittelen lämpimästi DRF tutoriaalin läpikäyntiä.
+* Jos tarve päästä tekemään suoraan abstrakteilla toteutuksilla:
+* Tutorial 1: ModelSerializers.
+* Tutorial 3: generic class-based views
+1. Asenna django rest framework: pip install djangorestframework
+2. Luo API applikaatio.
+3. Muokkaa asetuksia käyttämään uutta API applikaatiota ja rest_framework applikaatiota.
+4. Luo API näkymät (käytä geneerisiä luokka pohjaisia näkymiä).
+5. Luo serializerit (käytä ModelSerializereja).
+6. Luo oma permission objekti (salli muokkaus vain objectin omistajalle).
+7. Muokkaa olemassa olevan applikaation urls.py:ta ja includoi API urlit.
+8. Luo API:n urls.py tiedosto jossa reitität pyynnöt näkymiin.
+9. OPTIONAL: Lisää selain tuki API:n seuraamalla tutorialia.
+
+## Toteutus
+* Herokussa tarjolla olevaa palvelua päivitetty.
+* Sovellus tukee rekisteröitymistä.
+* Sovellus tukee sisään- ja uloskirjautumista.
+* Käyttäjä voi vaihtaa salasanaa.
+* Käyttäjät voivat luoda/muokata/poistaa keskusteluja.
+* Käyttäjät voivat lisätä/muokata/poistaa kommentteja keskusteluihin.
+* Käyttäjät voivat kirjautua palveluun Github tilillä.
+* Käyttäjät voivat erottaa Github tilinsä palvelutilistä.
+* Käyttäjät voivat tehdä GET/POST/PUT/DELETE kutsuja ohjelman API:n. Ohje löytyy README:sta.
+
+## Verkkolähteet
+* Django Rest Framework: http://www.django-rest-framework.org/#tutorial
+* DRF permissions: http://www.django-rest-framework.org/api-guide/permissions/
+
+## Helpot ja vaikeat asiat
+### Helpot asiat
+* DRF tarjoaa paljon valmiita abstraktioita, joiden avulla pienellä määrällä koodia saa paljon aikaiseksi.
+* API:n testaaminen on helppoa kun käyttää httpie ohjelmaa.
+* API:n saaminen selattavaksi (hyperlinkit puuttuvat).
+
+### Vaikeat asiat
+* Django modelien Foreignkey kuvaaminen Serializerissa.
+* Turhien tietojen piilottaminen API:n browser versiossa (Foreignkey:t).
+* Oikeuksien rajoittaminen niin, että API:n kautta vain keskustelujen ja kommenttien omistaja saa muokata/poistaa niitä.
+
+## Koodiotteet
+Python
+```python
+# Permission logic for limiting access to author.
+class IsOwnerOrReadOnly(permissions.BasePermission):
+    """
+    Object-level permission to only allow owners of an object to edit it.
+    Assumes the model instance has an `author` attribute.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        # Read permissions are allowed to any request,
+        # so we'll always allow GET, HEAD or OPTIONS requests.
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        # Instance must have an attribute named `author`.
+        return obj.author == request.user
+
+
+# API views.
+class TopicList(generics.ListCreateAPIView):
+    """
+    List all topics or create a new topic.
+    """
+    queryset = Topic.objects.all()
+    serializer_class = TopicSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+class TopicDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, update or delete a topic instance.
+    """
+    queryset = Topic.objects.all()
+    serializer_class = TopicSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)
+
+
+class CommentList(generics.ListCreateAPIView):
+    """
+    List all comments or create a new comment.
+    """
+    serializer_class = CommentSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        topic_id = self.kwargs['topic_id']
+        return Comment.objects.filter(topic__pk=topic_id)
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, update or delete a comment instance.
+    """
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)
+
+    def get_queryset(self):
+        topic_id = self.kwargs['topic_id']
+        return Comment.objects.filter(topic__pk=topic_id)
+
+
+# API serializers.
+class CommentSerializer(serializers.ModelSerializer):
+    """
+    Serializer for reading/writing Comment models.
+    """
+    author = serializers.ReadOnlyField(source='author.username')
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'author', 'text', 'topic')
+
+
+class TopicSerializer(serializers.ModelSerializer):
+    """
+    Serializer for reading/writing Topic models.
+    """
+    author = serializers.ReadOnlyField(source='author.username')
+
+    class Meta:
+        model = Topic
+        fields = ('id', 'author', 'name', 'text')
+
+
+# Settings applikaatiot
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'social_django',
+    'rest_framework',
+    'lunchapp',
+    'lunchapi',
+    'bootstrap3',
+]
+```
 
 
 # Vaihe 3

@@ -2,7 +2,8 @@
 This is project work for course MAT-81000 (2017) of TUT.
  
 ## Lunch application
-
+Discuss with fellow forum members about any subject. TUT lunch list
+offers source of data for discussions about TUT restaurant food quality.
 
 ## Lunch API
 ### Topics list:

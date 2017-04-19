@@ -1,8 +1,17 @@
 from django.conf.urls import url, include
 from django.contrib.auth.views import logout
-
-
 from . import views
+
+
+__author__ = "Ville Myllynen"
+__copyright__ = "Copyright 2017, Ohsiha Project"
+__credits__ = ["Ville Myllynen"]
+__license__ = "MIT"
+__version__ = "1.0"
+__maintainer__ = "Ville Myllynen"
+__email__ = "ville.myllynen@student.tut.fi"
+__status__ = "Development"
+
 
 urlpatterns = [
     url(r'^$', views.IndexPage.as_view(), name='lunch_index'),
