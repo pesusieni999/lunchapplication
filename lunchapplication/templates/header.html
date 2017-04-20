@@ -14,14 +14,14 @@
         {% url 'register' as register_url %}
         {% url 'login' as login_url %}
         {% url 'lunch_index' as lunch_index_url %}
-        <li {% if request.path == lunch_index_url %} class="active" {% endif %}>
+        <li>
           <a href="{% url 'lunch_index' %}">Lunch</a>
         </li>
         {% if not user.is_authenticated %}
-        <li {% if request.path == register_url %} class="active" {% endif %}>
+        <li>
           <a href="{{ register_url }}">Register</a>
         </li>
-        <li {% if request.path == login_url %} class="active" {% endif %}>
+        <li>
           <a href="{{ login_url }}" id="loginLinkId">
             Login <span class="glyphicon glyphicon-log-in"></span>
           </a>

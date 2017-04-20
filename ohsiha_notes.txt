@@ -31,7 +31,7 @@ Lähdekoodi löytyy github projektista: https://github.com/pesusieni999/lunchapp
 9. OPTIONAL: Lisää selain tuki API:n seuraamalla tutorialia.
 
 ## Toteutus
-* En toteuttanut "ei-triviaalin UI:n tekoa". 
+* En toteuttanut "ei-triviaalin UI:n tekoa".
 * Herokussa tarjolla olevaa palvelua päivitetty.
 * Sovellus tukee rekisteröitymistä.
 * Sovellus tukee sisään- ja uloskirjautumista.
